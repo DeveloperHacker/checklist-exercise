@@ -9,10 +9,8 @@ fun function(argument1, argument2) = parameter4 + " " + argument1 + ":" + argume
 
 val value1 = parameter3 + parameter1 * 30
 
-enum result {
-    "result1" + function(parameter2, value1)
-    if (parameter5 == "10" && parameter6)
-        "result2"
-    else
-        "result3"
-}
+"result1" + function(parameter2, value1)
+if (parameter5 == "10" && parameter6)
+    "result2"
+else
+    "result3"

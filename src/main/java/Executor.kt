@@ -7,18 +7,23 @@ typealias Values = Set<String>
 
 class Executor {
     private fun getParameters(file: FileNode, parameters: Parameters): Pair<Parameters, Values> {
-        val newParameters = file.variables
+        val variables = file.variables
                 .filterIsInstance<ParameterNode>()
-                .map { it.name!!.value to 0 }
+                .map { it to 0 }
                 .toMap()
-        val uninitializedParameter = newParameters.asSequence()
-                .map(Map.Entry<String, Int>::key)
-                .filterNot(parameters::containsKey)
+        val uninitializedParameter = variables.asSequence()
+                .map { it.key }
+                .filterNot { it.hasInitializer }
+                .filterNot { parameters.containsKey(it.name!!.text) }
                 .firstOrNull()
         uninitializedParameter?.let {
-            throw ProcessException("Parameter '$it' is not initialized in file '${file.name}'")
+            val (line, column) = it.position
+            val name = file.name
+            val message = "Uninitialized parameter: ${it.name!!.text}"
+            throw ProcessException("$name:[$line, $column] $message")
         }
-        return Pair(newParameters, newParameters.keys)
+        val result = variables.map { it.key.name!!.text to it.value }.toMap()
+        return Pair(result, result.keys)
     }
 
     fun exec(storage: FileNode, checklist: FileNode): Triple<Values, Values, Values> {

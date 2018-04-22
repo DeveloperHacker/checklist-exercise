@@ -2,6 +2,7 @@ package ast
 
 import tokens.Token
 
+
 fun Node.findChildByToken(token: Token): TokenNode? =
         children.firstOrNull { it is TokenNode && it.token == token } as TokenNode?
 
@@ -22,5 +23,5 @@ fun Node.println(indentation: Int) {
     for (child in children)
         child.println(indentation + 1)
     if (children.isEmpty())
-        println("|".repeat(indentation + 1) + "'$text'")
+        println("|".repeat(indentation + 1) + "$this")
 }

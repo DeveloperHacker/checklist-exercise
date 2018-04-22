@@ -1,3 +1,3 @@
 package ast
 
-class BinaryExpressionNode: ExpressionNode()
+class BinaryExpressionNode(position: Pair<Int, Int>): ExpressionNode(position)

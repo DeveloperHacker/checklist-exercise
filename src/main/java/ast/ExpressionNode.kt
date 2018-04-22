@@ -1,3 +1,3 @@
 package ast
 
-abstract class ExpressionNode : Node()
+abstract class ExpressionNode(position: Pair<Int, Int>): Node(position)

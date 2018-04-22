@@ -4,7 +4,7 @@ NUMBER ::= r"[0-9]+"
 
 BOOLEAN ::= 'true' | 'false'
 
-STRING ::= r"\"[^("|\n)]\""
+STRING ::= r"\"[^("|\n)]*\""
 
 parameterDefinition ::= 'par' IDENTIFIER
 
@@ -12,9 +12,7 @@ valueDefinition ::= 'val' IDENTIFIER '=' expression
 
 functionDefinition ::= 'fun' IDENTIFIER '(' IDENTIFIER{','} ')' '=' expression
 
-enumDefinition ::= 'enum' IDENTIFIER block
-
-definition ::= parameterDefinition | valueDefinition | functionDefinition | enumDefinition
+definition ::= parameterDefinition | valueDefinition | functionDefinition
 
 block ::= '{' statement{'\n'} '}'
 
@@ -49,4 +47,4 @@ logicOrExpression ::= logicAndExpression['||']
 
 expression ::= logicOrExpression
 
-file ::= definition{'\n'}
+file ::= (definition | statement){'\n'}

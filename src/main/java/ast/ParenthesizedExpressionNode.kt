@@ -1,3 +1,3 @@
 package ast
 
-class ParenthesizedExpressionNode: ExpressionNode()
+class ParenthesizedExpressionNode(position: Pair<Int, Int>): ExpressionNode(position)

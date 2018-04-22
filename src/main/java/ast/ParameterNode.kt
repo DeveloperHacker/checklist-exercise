@@ -1,3 +1,3 @@
 package ast
 
-class ParameterNode: VariableNode()
+class ParameterNode(position: Pair<Int, Int>): VariableNode(position)

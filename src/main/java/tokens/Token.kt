@@ -9,9 +9,9 @@ open class Token(val name: String) {
         return true
     }
 
-    override fun hashCode(): Int {
-        return name.hashCode()
-    }
+    override fun hashCode() = name.hashCode()
+
+    override fun toString() = name
 }
 
 class ValueToken(name: String, val value: String) : Token(name) {
@@ -24,9 +24,5 @@ class ValueToken(name: String, val value: String) : Token(name) {
         return true
     }
 
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + value.hashCode()
-        return result
-    }
+    override fun hashCode() = 31 * super.hashCode() + value.hashCode()
 }

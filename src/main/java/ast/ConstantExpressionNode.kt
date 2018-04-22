@@ -1,3 +1,3 @@
 package ast
 
-class ConstantExpressionNode: ExpressionNode()
+class ConstantExpressionNode(position: Pair<Int, Int>): ExpressionNode(position)
