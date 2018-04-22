@@ -8,7 +8,7 @@ Usage:
 * Other ```java -jar target/checklist-jar-with-dependencies.jar <storage> <checklist>```
 
 Example:
-######TripList.cl
+###### TripList.cl
 ```
     "## Список в поездку"
     
@@ -40,14 +40,14 @@ Example:
     "* Паспорт"
     "* Страховка"
 ```
-######USA.cl
+###### USA.cl
 ```
     par страна = "США"
     par дни = 11
     par градусы = 3
 ```
 Run checklist generator ```./checklist USA.cl TripList.cl >> output.md```
-######output.md
+###### output.md
 ```
 ## Список в поездку
     * Переходник на американские розетки
