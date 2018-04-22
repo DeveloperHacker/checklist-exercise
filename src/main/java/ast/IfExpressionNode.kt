@@ -1,3 +1,3 @@
 package ast
 
-class IfExpressionNode: ExpressionNode()
+class IfExpressionNode(position: Pair<Int, Int>): ExpressionNode(position)

@@ -2,7 +2,7 @@ package ast
 
 import tokens.IDENTIFIER
 
-class NameExpressionNode : ExpressionNode() {
+class NameExpressionNode(position: Pair<Int, Int>): ExpressionNode(position) {
     val name: TokenNode?
         get() = findChildByToken(IDENTIFIER)
 }

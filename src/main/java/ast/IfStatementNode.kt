@@ -1,3 +1,3 @@
 package ast
 
-class IfStatementNode: Node()
+class IfStatementNode(position: Pair<Int, Int>): Node(position)

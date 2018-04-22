@@ -1,6 +1,6 @@
 package ast
 
-abstract class Node {
+abstract class Node(val position: Pair<Int, Int>) {
     var parent: Node? = null
         private set
 
@@ -14,6 +14,5 @@ abstract class Node {
         child.parent = this
     }
 
-    open val text: String
-        get() = javaClass.name
+    override fun toString() = javaClass.name.toString()
 }

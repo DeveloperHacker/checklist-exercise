@@ -1,3 +1,3 @@
 package ast
 
-class BlockNode: Node()
+class BlockNode(position: Pair<Int, Int>): Node(position)

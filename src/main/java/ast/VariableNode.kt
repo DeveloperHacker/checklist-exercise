@@ -2,7 +2,7 @@ package ast
 
 import tokens.IDENTIFIER
 
-abstract class VariableNode : DefinitionNode() {
+abstract class VariableNode(position: Pair<Int, Int>): DefinitionNode(position) {
     val hasInitializer: Boolean
         get() = initializer != null
 

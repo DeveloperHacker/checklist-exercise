@@ -4,9 +4,8 @@ package tokens
 val PAR = ValueToken("PAR", "par")
 val VAL = ValueToken("VAL", "val")
 val FUN = ValueToken("FUN", "fun")
-val ENUM = ValueToken("ENUM", "enum")
 val AND_AND = ValueToken("AND_AND", "&&")
-val OR_OR = ValueToken("OR_OR", "&&")
+val OR_OR = ValueToken("OR_OR", "||")
 val PLUS = ValueToken("PLUS", "+")
 val MINUS = ValueToken("MINUS", "-")
 val MUL = ValueToken("MUL", "*")
@@ -22,21 +21,28 @@ val RPAR = ValueToken("RPAR", ")")
 val LBRACE = ValueToken("LBRACE", "{")
 val RBRACE = ValueToken("RBRACE", "}")
 val EQ = ValueToken("EQ", "=")
+val COMMA = ValueToken("COMMA", ",")
 val IF = ValueToken("IF", "if")
 val ELSE = ValueToken("ELSE", "else")
 val IDENTIFIER = Token("IDENTIFIER")
 val STRING = Token("STRING")
 val BOOLEAN = Token("BOOLEAN")
 val INTEGER = Token("INTEGER")
+val EOF = Token("EOF")
+
+val simpleComment = Pair("\\\\", "\n")
+val complexComment = Pair("\\*", "*\\")
 
 val whiteSpaces = setOf(' ', '\n', '\t', '\r')
 
+val symbols = setOf(',', '\\', '(', ')', '{', '}', '=', '<', '>', '!', '+', '-', '*', '/', '&', '|')
+
 val valueTokens = setOf(
-        PAR, VAL, FUN, ENUM,
+        PAR, VAL, FUN,
         AND_AND, OR_OR, PLUS, MINUS, MUL, DIV,
         EQEQ, EXCL_EQ, LT, GT, LT_EQ, GT_EQ,
         LPAR, RPAR, LBRACE, RBRACE,
-        EQ, IF
+        EQ, IF, ELSE, COMMA
 )
 
 val binaryOperationTokens = setOf(

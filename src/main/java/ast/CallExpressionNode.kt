@@ -1,3 +1,3 @@
 package ast
 
-class CallExpressionNode: ExpressionNode()
+class CallExpressionNode(position: Pair<Int, Int>): ExpressionNode(position)

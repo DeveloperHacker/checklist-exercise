@@ -1,3 +1,3 @@
 package ast
 
-open class DefinitionNode : Node()
+open class DefinitionNode(position: Pair<Int, Int>): Node(position)
