@@ -16,7 +16,7 @@ definition ::= parameterDefinition | valueDefinition | functionDefinition
 
 block ::= '{' statement{'\n'} '}'
 
-ifStatement ::= 'if' '(' expression ')' (statement | block) 'else' (statement | block)
+ifStatement ::= 'if' '(' expression ')' (statement | block) ('else' (statement | block))?
 
 statement ::= ifStatement | expression
 

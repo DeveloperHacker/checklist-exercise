@@ -1,6 +1,4 @@
-par parameter2 = "lol"
-par parameter3 = "kek"
-par parameter5 = "lolec"
-par parameter6 = "cheburek"
-par parameter7 = "cheburek"
-\\par parameter8 = "cheburek"
+par страна = "США"
+par дни = 11
+par градусы = 15
+

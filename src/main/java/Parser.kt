@@ -62,7 +62,7 @@ class Parser {
         if (!at(LPAR)) return nameExpression
         marker.rollback()
         val callExpression = CallExpressionNode(position())
-        expected(nameExpression, IDENTIFIER)
+        expected(callExpression, IDENTIFIER)
         expected(callExpression, LPAR)
         while (!at(RPAR)) {
             callExpression.addChild(parseExpression())
@@ -100,7 +100,13 @@ class Parser {
         return ifExpression
     }
 
-    private fun parseParenthesizedExpression(): ParenthesizedExpressionNode = TODO()
+    private fun parseParenthesizedExpression(): ParenthesizedExpressionNode {
+        val expression = ParenthesizedExpressionNode(position())
+        expected(expression, LPAR)
+        expression.addChild(parseExpression())
+        expected(expression, RPAR)
+        return expression
+    }
 
     private fun parseAtomicExpression() = when {
         at(IF) -> parseIfExpression()
@@ -175,11 +181,13 @@ class Parser {
             at(LBRACE) -> parseBlock()
             else -> parseStatement()
         })
-        expected(statement, ELSE)
-        statement.addChild(when {
-            at(LBRACE) -> parseBlock()
-            else -> parseStatement()
-        })
+        if (at(ELSE)) {
+            expected(statement, ELSE)
+            statement.addChild(when {
+                at(LBRACE) -> parseBlock()
+                else -> parseStatement()
+            })
+        }
         return statement
     }
 

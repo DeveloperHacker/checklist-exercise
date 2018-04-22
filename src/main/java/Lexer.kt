@@ -4,7 +4,7 @@ class LexerException(val position: Pair<Int, Int>, message: String) : Exception(
 
 class Lexer(private val data: String) {
 
-    private var offset = whiteSpaceLength(0)
+    private var offset = 0
 
     private var isEOF = false
 
@@ -12,7 +12,7 @@ class Lexer(private val data: String) {
 
     private lateinit var currentTokenText: String
 
-    private fun whiteSpaceLength(offset: Int): Int {
+    private fun whiteSpaceLength(): Int {
         val data = data.substring(offset)
         var counter = 0
         for (char in data) {
@@ -22,7 +22,7 @@ class Lexer(private val data: String) {
         return counter
     }
 
-    private fun commentLength(offset: Int, comment: Pair<String, String>): Int {
+    private fun commentLength(comment: Pair<String, String>): Int {
         val (first, second) = comment
         val data = data.substring(offset)
         if (!data.startsWith(first)) return 0
@@ -32,16 +32,16 @@ class Lexer(private val data: String) {
 
     private fun shift(value: Int) {
         offset += value
-        offset += whiteSpaceLength(offset)
+        offset += whiteSpaceLength()
         var modify = true
         while (modify) {
             modify = false
-            val complexCommentLength = commentLength(offset, complexComment)
-            val simpleCommentLength = commentLength(offset, simpleComment)
+            val complexCommentLength = commentLength(complexComment)
+            val simpleCommentLength = commentLength(simpleComment)
             val commentLength = maxOf(simpleCommentLength, complexCommentLength)
             if (commentLength > 0) {
                 offset += commentLength
-                offset += whiteSpaceLength(offset)
+                offset += whiteSpaceLength()
                 modify = true
             }
         }
@@ -92,7 +92,7 @@ class Lexer(private val data: String) {
 
     private fun advanceIdentifierTokenOrNull(): Pair<Token, String>? {
         val current = rawTokenText()
-        if (!current.matches("[a-zA-Z_][a-zA-Z_0-9]*".toRegex())) return null
+        if (!current.matches("[a-zA-Zа-яА-Я_][a-zA-Zа-яА-Я_0-9]*".toRegex())) return null
         return Pair(IDENTIFIER, current)
     }
 
@@ -163,6 +163,7 @@ class Lexer(private val data: String) {
     fun mark() = Marker()
 
     init {
+        shift(0)
         advance()
     }
 }

@@ -1,16 +1,29 @@
-par parameter1 = 10
-par parameter2
-par parameter3
-par parameter4 = "string"
-par parameter5
-par parameter6
+"## Список в поездку"
 
-fun function(argument1, argument2) = parameter4 + " " + argument1 + ":" + argument2
+fun Переходник(страна) = "Переходник на " + страна + " розетки"
 
-val value1 = parameter3 + parameter1 * 30
+par страна
+if (страна == "США") {
+    Переходник("американские")
+    "Доллары"
+    "Долларавая карточка"
+} else if (страна == "Великобритания") {
+    Переходник("британские")
+    "фунты"
+    "Любая карточка"
+}
 
-"result1" + function(parameter2, value1)
-if (parameter5 == "10" && parameter6)
-    "result2"
-else
-    "result3"
+par дни
+"# Нижняя одежда"
+"* Трусы, " + (дни + 1) + " пар"
+"* Носки, " + (дни + 1) + " пар"
+
+par градусы
+"# Верхняя одежда"
+if (градусы < 0) "* Теплая куртка"
+if (градусы < 10) "* Свитер"
+"* Легкая куртка"
+
+"# Документы"
+"* Паспорт"
+"* Страховка"

@@ -9,10 +9,8 @@ fun process(storageFile: File, checklistFile: File) {
     val storage = parser.parse(storageFile.name, storageData)
     val checklist = parser.parse(checklistFile.name, checklistData)
     val executor = Executor()
-    val (normal, underflow, overflow) = executor.exec(storage, checklist)
-    for (item in underflow) println("- $item")
-    for (item in overflow) println("+ $item")
-    for (item in normal) println("= $item")
+    val result = executor.exec(storage, checklist)
+    for (item in result) println(item)
 }
 
 fun main(args: Array<String>) {

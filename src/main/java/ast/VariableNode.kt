@@ -9,6 +9,6 @@ abstract class VariableNode(position: Pair<Int, Int>): DefinitionNode(position) 
     val initializer: ExpressionNode?
         get() = findChildByClass()
 
-    val name: TokenNode?
-        get() = findChildByToken(IDENTIFIER)
+    val name: String
+        get() = findChildByToken(IDENTIFIER)!!.text
 }
