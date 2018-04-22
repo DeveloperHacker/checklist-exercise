@@ -49,7 +49,7 @@ Example:
 Run checklist generator ```./checklist USA.cl TripList.cl >> output.md```
 ###### output.md
 ```
-## Список в поездку
+    ## Список в поездку
     * Переходник на американские розетки
     * Доллары
     * Долларавая карточка
