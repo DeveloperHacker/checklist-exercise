@@ -64,8 +64,8 @@ class Executor {
         val leftValue = exec(left)
         val operation = expression.operation
         val resultValue: Any = when (operation.token) {
-            EQ_EQ -> leftValue == exec(right)
-            EXCL_EQ -> leftValue != exec(right)
+            EQ_EQ -> leftValue.value == exec(right).value
+            EXCL_EQ -> leftValue.value != exec(right).value
             PLUS -> {
                 val rightValue = exec(right)
                 when (leftValue) {
