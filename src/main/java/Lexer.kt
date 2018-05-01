@@ -47,22 +47,21 @@ class Lexer(private val data: String) {
         }
     }
 
+    private fun Iterable<String>.firstOccurrence(data: String) = map { data.indexOf(it) }
+            .map { if (it == -1) data.length else it }
+            .min()!!
+
     private fun rawTokenText(): String {
         val data = data.substring(offset)
-        val firstWhiteSpace = whiteSpaces
-                .map { data.indexOf(it) }
-                .map { if (it == -1) data.length else it }
-                .min()!!
-        val firstSymbol = symbols
-                .map { data.indexOf(it) }
-                .map { if (it == -1) data.length else it }
-                .min()!!
+        val firstWhiteSpace = whiteSpaces.map { it.toString() }.firstOccurrence(data)
+        val firstComment = listOf(simpleComment.first, complexComment.first).firstOccurrence(data)
+        val firstSymbol = symbolTokens.map { it.value }.firstOccurrence(data)
         if (firstSymbol == 0) {
-            val firstNonSymbol = data.indexOfFirst { it !in symbols }
-            if (firstNonSymbol == -1) return data
-            return data.substring(0, firstNonSymbol)
+            val availableSymbols = symbolTokens.map { it.value }.filter { data.startsWith(it) }
+            val symbol = availableSymbols.maxBy { it.length } ?: return data
+            return data.substring(0, symbol.length)
         }
-        return data.substring(0, minOf(firstWhiteSpace, firstSymbol))
+        return data.substring(0, minOf(firstWhiteSpace, firstComment, firstSymbol))
     }
 
     private fun advanceValueTokenOrNull(): Pair<ValueToken, String>? {

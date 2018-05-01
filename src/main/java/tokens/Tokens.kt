@@ -35,7 +35,12 @@ val complexComment = Pair("/*", "*/")
 
 val whiteSpaces = setOf(' ', '\n', '\t', '\r')
 
-val symbols = setOf(',', '(', ')', '{', '}', '=', '<', '>', '!', '+', '-', '*', '/', '&', '|')
+val symbolTokens = setOf(
+        AND_AND, OR_OR, PLUS, MINUS, MUL, DIV,
+        EQ_EQ, EXCL_EQ, LT, GT, LT_EQ, GT_EQ,
+        LPAR, RPAR, LBRACE, RBRACE,
+        EQ, COMMA
+)
 
 val valueTokens = setOf(
         PAR, VAL, FUN,

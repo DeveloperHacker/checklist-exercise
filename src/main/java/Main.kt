@@ -2,40 +2,31 @@ import java.io.File
 
 class ProcessException(message: String) : Exception(message)
 
-fun process(storageFile: File, checklistFile: File) {
-    val storageData = storageFile.readText()
-    val checklistData = checklistFile.readText()
+fun process(files: List<File>) {
     val parser = Parser()
-    val storage = parser.parse(storageFile.name, storageData)
-    val checklist = parser.parse(checklistFile.name, checklistData)
+    val trees = files.map { parser.parse(it.name, it.readText()) }
     val executor = Executor()
-    val result = executor.exec(storage, checklist)
+    val result = executor.exec(trees)
     for (item in result) println(item)
 }
 
 fun main(args: Array<String>) {
-    val help = "Usage checklist [storage] [checklist]"
+    val help = "Usage checklist [file [, file]"
+    if (args.isEmpty()) {
+        System.err.println("Wrong number of arguments\n$help")
+        System.exit(1)
+    }
     if (args.size == 1 && (args[0] == "-h" || args[0] == "--help")) {
         println(help)
         System.exit(0)
     }
-    if (args.size != 2) {
-        System.err.println("Wrong number of arguments\n$help")
-        System.exit(1)
-    }
-    val (storageName, checklistName) = args
-    val storageFile = File(storageName)
-    val checklistFile = File(checklistName)
-    if (!storageFile.isFile) {
-        System.err.println("Storage file '${storageFile.absolutePath}' not exist")
-        System.exit(1)
-    }
-    if (!checklistFile.isFile) {
-        System.err.println("CheckList file '${checklistFile.absolutePath}' not exist")
+    val files = args.map(::File)
+    files.filterNot(File::isFile).map(File::getAbsolutePath).forEach {
+        System.err.println("Storage file '$it' not exist")
         System.exit(1)
     }
     try {
-        process(storageFile, checklistFile)
+        process(files)
     } catch (ex: ProcessException) {
         System.err.println(ex.message)
         System.exit(1)

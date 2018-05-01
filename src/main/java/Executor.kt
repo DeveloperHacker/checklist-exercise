@@ -1,6 +1,7 @@
 import ast.*
 import tokens.*
 import java.util.*
+import kotlin.collections.HashMap
 
 sealed class Object<out T : Any>(val value: T)
 class IntegerObject(value: Int) : Object<Int>(value)
@@ -21,17 +22,51 @@ data class Value(val node: ValueNode, val value: Object<*>)
 
 data class Argument(val node: TokenNode, val value: Object<*>)
 
-data class Environment(
-        val functions: Map<String, Function>,
-        val values: MutableMap<String, Value>,
-        val parameters: MutableMap<String, Parameter>,
-        val arguments: Map<String, Argument>
-) {
-    fun replaceArguments(arguments: Map<String, Argument>) =
-            Environment(functions, values, parameters, arguments)
+data class FunctionName(val name: String, val numArguments: Int) {
+    companion object {
+        fun valueOf(node: FunctionNode) = FunctionName(node.name, node.arguments.size)
+
+        fun valueOf(node: CallExpressionNode) = FunctionName(node.name, node.arguments.size)
+    }
 }
 
-data class Result(val parameters: Map<String, Parameter>, val values: List<String>)
+class Environment private constructor(
+        private val depth: Int,
+        private val parent: Environment?,
+        private val functions: Map<FunctionName, Function>,
+        private val arguments: Map<String, Argument>
+) {
+
+    private val values = HashMap<String, Value>()
+    private val parameters = HashMap<String, Parameter>()
+
+    private val localParent: Environment?
+        get() = if (parent?.depth == depth) parent else null
+
+    constructor() : this(0, null, emptyMap(), emptyMap())
+
+    fun replaceFunctions(functions: Map<FunctionName, Function>) =
+            Environment(depth + 1, this, functions, emptyMap())
+
+    fun replaceArguments(arguments: Map<String, Argument>) =
+            Environment(depth, this, emptyMap(), arguments)
+
+    fun getFunction(name: FunctionName): Function? = functions[name] ?: parent?.getFunction(name)
+
+    fun getArgument(name: String): Argument? = arguments[name] ?: localParent?.getArgument(name)
+
+    fun getValue(name: String): Value? = values[name] ?: localParent?.getValue(name)
+
+    fun getParameter(name: String): Parameter? = parameters[name] ?: parent?.getParameter(name)
+
+    fun getLocalParameter(name: String): Parameter? = parameters[name] ?: localParent?.getParameter(name)
+
+    fun setValue(name: String, value: Value) = values.set(name, value)
+
+    fun setParameter(name: String, parameter: Parameter) = parameters.set(name, parameter)
+}
+
+data class Result(val enviroment: Environment, val values: List<String>)
 
 class Executor {
     private fun error(file: FileNode, node: Node, message: String): Nothing {
@@ -158,9 +193,9 @@ class Executor {
             expression: CallExpressionNode,
             environment: Environment
     ): Object<*> {
-        val name = expression.name
-        val function = environment.functions[name]
-                ?: error(file, expression, "Unresolved reference: $name")
+        val functionName = FunctionName.valueOf(expression)
+        val function = environment.getFunction(functionName)
+                ?: error(file, expression, "Unresolved reference: ${functionName.name}")
         val argumentNames = function.node.arguments.map { it }
         val argumentValues = expression.arguments.map { it }
         if (argumentNames.size > argumentValues.size)
@@ -184,9 +219,9 @@ class Executor {
             environment: Environment
     ): Object<*> {
         val name = expression.name
-        environment.arguments[name]?.let { return it.value }
-        environment.values[name]?.let { return it.value }
-        environment.parameters[name]?.let { return it.value }
+        environment.getArgument(name)?.let { return it.value }
+        environment.getValue(name)?.let { return it.value }
+        environment.getParameter(name)?.let { return it.value }
         error(file, expression, "Unresolved reference: $name")
     }
 
@@ -223,22 +258,21 @@ class Executor {
     private fun processParameter(
             file: FileNode,
             it: ParameterNode,
-            parameters: Map<String, Parameter>,
             environment: Environment
     ) {
         val name = it.name
-        if (environment.parameters.containsKey(name))
+        if (environment.getLocalParameter(name) != null)
             error(file, it, "Parameter redefinition: $name")
-        val parameter = parameters[name]
+        val parameter = environment.getParameter(name)
         if (parameter != null) {
             val value = parameter.value
-            environment.parameters[name] = Parameter(it, value)
+            environment.setParameter(name, Parameter(it, value))
             return
         }
         val initializer = it.initializer
         if (initializer != null) {
             val value = exec(file, initializer, environment)
-            environment.parameters[name] = Parameter(it, value)
+            environment.setParameter(name, Parameter(it, value))
             return
         }
         error(file, it, "Uninitialized parameter: $name")
@@ -246,12 +280,12 @@ class Executor {
 
     private fun processValue(file: FileNode, it: ValueNode, environment: Environment) {
         val name = it.name
-        if (environment.values.containsKey(name))
+        if (environment.getValue(name) != null)
             error(file, it, "Value redefinition: $name")
         val initializer = it.initializer
         if (initializer != null) {
             val value = exec(file, initializer, environment)
-            environment.values[name] = Value(it, value)
+            environment.setValue(name, Value(it, value))
             return
         }
         error(file, it, "Uninitialized value: $name")
@@ -292,23 +326,28 @@ class Executor {
                     .map { processStatement(file, it, environment) }
                     .fold(listOf<String>()) { acc, it -> acc + it }
 
-    private fun process(file: FileNode, parameters: Map<String, Parameter>): Result {
-        val functions = file.functions.map { it.name to Function(it) }.toMap()
-        val environment = Environment(functions, HashMap(), HashMap(), HashMap())
+    private fun process(file: FileNode, globalEnvironment: Environment): Result {
+        val functions = file.functions.map { FunctionName.valueOf(it) to Function(it) }.toMap()
+        val environment = globalEnvironment.replaceFunctions(functions)
         val results = ArrayList<String>()
         loop@ for (it in file.executable) {
             when (it) {
-                is ParameterNode -> processParameter(file, it, parameters, environment)
+                is ParameterNode -> processParameter(file, it, environment)
                 is ValueNode -> processValue(file, it, environment)
                 else -> results.addAll(processStatement(file, it, environment))
             }
         }
-        return Result(environment.parameters, results)
+        return Result(environment, results)
     }
 
-    fun exec(storage: FileNode, checklist: FileNode): List<String> {
-        val (parameters, storageValues) = process(storage, HashMap())
-        val (_, checklistValues) = process(checklist, parameters)
-        return checklistValues + "\n" + storageValues
+    fun exec(files: Iterable<FileNode>): List<String> {
+        var globalEnvironment = Environment()
+        val result = ArrayList<String>()
+        for (file in files) {
+            val (environment, values) = process(file, globalEnvironment)
+            globalEnvironment = environment
+            result.addAll(values)
+        }
+        return result
     }
 }
