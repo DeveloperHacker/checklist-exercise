@@ -1,4 +1,3 @@
-par страна = "США"
-par дни = 11
-par градусы = 3
-
+#global val страна: США
+#global val par дни: $11
+#global val par градусы: $3
